@@ -2,9 +2,9 @@
 
     /**
      * Plugin Name: Consultas REST simples e diretas
-     * Plugin URI: https://bake.com.vc
+     * Plugin URI: https://github.com/brunomorenobm/wp-easyrest-api
      * Description: Consultas simples para listagem de produtos de forma fácil e direta.
-     * Author URI: https://bake.com.vc
+     * Author URI: https://github.com/brunomorenobm
      * Text Domain: wp-easy-rest-api
      * Domain Path: /api
      * License: GPLv2 or later
@@ -16,9 +16,9 @@
 
 
     add_action('rest_api_init', function () {
-        register_rest_route('easy-rest/v1', '/products/(?P<id>\d+)', array(
+        register_rest_route('easy-rest/v1', '/products', array(
             'methods' => 'GET',
-            'callback' => 'get_products_easilly',
+            'callback' => 'get_products',
             'permission_callback' => 'permission_callback',
         ));
     });
@@ -30,7 +30,7 @@
 
 
 
-    function get_products_easilly($data)
+    function get_products($data)
     {
         $dbProducts = wc_get_products(array('status' => 'publish', 'limit' => -1));
         $jsonProducts = array();
