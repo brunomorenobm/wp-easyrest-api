@@ -5,7 +5,7 @@
 List all products with variances
 
 `
-http://{{ _.hostname }}/index.php/wp-json/easy-rest/v1/products
+http://{{ _.hostname }}/wp-json/easy-rest/v1/products
 `
 
 ```json
@@ -34,6 +34,8 @@ http://{{ _.hostname }}/index.php/wp-json/easy-rest/v1/products
     "name": "Ovo Bolo de Cenoura - Vegano",
     "description": "Camadas de bolo de cenoura fofinho com com <strong>Ganache de chocolate 54%<\/strong> ou <strong>\"Nutella\" vegana The Boinas <\/strong>+ Gotas e Raspas de chocolate.<strong> <\/strong>330g",
     "price": "",
+    "type": "variable",
+    "status": "publish"
     "variations": [
       {
         "variation_id": 3999,
@@ -46,8 +48,6 @@ http://{{ _.hostname }}/index.php/wp-json/easy-rest/v1/products
         "variation_text": "ganache"
       }
     ],
-    "type": "variable",
-    "status": "publish"
   }
 ]
 

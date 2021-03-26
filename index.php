@@ -32,6 +32,8 @@
 
     function get_products($data)
     {
+
+        // Read from configuration image size 
         $dbProducts = wc_get_products(array('status' => 'publish', 'limit' => -1));
         $jsonProducts = array();
         header('Content-Type: application/json; charset=UTF-8');
@@ -50,13 +52,17 @@
             $product_data[$i]['description'] = $product->get_description();
             $product_data[$i]['price']  = $product->get_price();
             $product_data[$i]['price']  = $product->get_regular_price();
+            $product_data[$i]['type'] = $product->get_type();
+            $product_data[$i]['status'] = $product->get_status();
+            $product_data[$i]['html_image'] = $product->get_image();
+            $product_data[$i]['image_croped'] = preg_replace('/(\..{2,4}?$)/i', '-100x100${1}', wp_get_attachment_url($product->get_image_id()));
+            $product_data[$i]['image_url'] = wp_get_attachment_url($product->get_image_id());
+
             if ($product->get_type() == 'variable') {
                 $product_data[$i]['variations']  = get_product_variations($product->get_available_variations());
             }
-            $product_data[$i]['type'] = $product->get_type();
-            $product_data[$i]['status'] = $product->get_status();
 
-            // $product_data[$i]['data'] = $product->get_data();
+            //$product_data[$i]['data'] = $product->get_data();
             $i++;
         }
         return  $product_data;
