@@ -46,6 +46,7 @@
         $i = 0;
         // Get an instance of the WC_Order object
         foreach ($dbProducts as $product) {
+            $image_url = wp_get_attachment_url($product->get_image_id());
             $product_data[$i]['product_id']       = $product->get_id();
             $product_data[$i]['category_id']     = $product->get_category_ids('view')[0];
             $product_data[$i]['name']         = $product->get_name();
@@ -54,9 +55,8 @@
             $product_data[$i]['price']  = $product->get_regular_price();
             $product_data[$i]['type'] = $product->get_type();
             $product_data[$i]['status'] = $product->get_status();
-            $product_data[$i]['html_image'] = $product->get_image();
-            $product_data[$i]['image_croped'] = preg_replace('/(\..{2,4}?$)/i', '-100x100${1}', wp_get_attachment_url($product->get_image_id()));
-            $product_data[$i]['image_url'] = wp_get_attachment_url($product->get_image_id());
+            $product_data[$i]['image_url_100x100'] = preg_replace('/(\..{2,4}?$)/i', '-100x100${1}', $image_url);
+            $product_data[$i]['image_url'] = $image_url;
 
             if ($product->get_type() == 'variable') {
                 $product_data[$i]['variations']  = get_product_variations($product->get_available_variations());
@@ -79,6 +79,73 @@
             $i++;
         }
         return $variation_data;
+    }
+
+
+
+    add_action('rest_api_init', function () {
+        register_rest_route('easy-rest/v1', '/search-orders', array(
+            'methods' => 'POST',
+            'callback' => 'get_orders_by_phone',
+            'args' => array(
+                'phone' => array(
+                    'validate_callback' => 'is_empty'
+                ),
+            ),
+            'permission_callback' => 'permission_callback',
+        ));
+    });
+
+    function get_orders_by_phone($data)
+    {
+        $phone = $data['phone'];
+
+        $dbOrders = wc_get_orders(
+            array(
+                'billing_phone' => $phone,
+            )
+        );
+
+        if (empty($dbOrders)) {
+            return null;
+        }
+
+
+        $order_data[] = [];
+        $i = 0;
+        // Get an instance of the WC_Order object
+        foreach ($dbOrders as $order) {
+            $order_data[$i]['date_created'] = (string) $order->get_date_created();
+            $order_data[$i]['order_id'] = $order->get_id();
+            $order_data[$i]['order_key'] = $order->get_order_key();
+            $order_data[$i]['billing_email'] = $order->get_billing_email();
+            $order_data[$i]['billing_first_name'] = $order->get_billing_first_name();
+            $order_data[$i]['billing_last_name'] = $order->get_billing_last_name();
+            $order_data[$i]['billing_address_1'] = $order->get_billing_address_1();
+            $order_data[$i]['billing_address_2'] = $order->get_billing_address_2();
+            $order_data[$i]['billing_city'] = $order->get_billing_city();
+            $order_data[$i]['billing_state'] = $order->get_billing_state();
+            $order_data[$i]['billing_postcode'] = $order->get_billing_postcode();
+            $order_data[$i]['billing_country'] = $order->get_billing_country();
+            $order_data[$i]['billing_phone'] = $order->get_billing_phone();
+            
+            $order_data[$i]['shipping_first_name'] = $order->get_shipping_first_name();
+            $order_data[$i]['shipping_last_name'] = $order->get_shipping_last_name();
+            $order_data[$i]['shipping_address_1'] = $order->get_shipping_address_1();
+            $order_data[$i]['shipping_address_2'] = $order->get_shipping_address_2();
+            $order_data[$i]['shipping_city'] = $order->get_shipping_city();
+            $order_data[$i]['shipping_state'] = $order->get_shipping_state();
+            $order_data[$i]['shipping_postcode'] = $order->get_shipping_postcode();
+            $order_data[$i]['shipping_country'] = $order->get_shipping_country();
+            
+            
+            $order_data[$i]['payment_method'] = $order->get_payment_method();
+            $order_data[$i]['payment_method_title'] = $order->get_payment_method_title();
+            $i++;
+           // $order_data[$i]['data'] = $order->get_data();
+        }
+
+        return $order_data;
     }
 
     ?>
